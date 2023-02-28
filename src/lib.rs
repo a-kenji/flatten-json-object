@@ -190,6 +190,9 @@ impl Flattener {
         if let Some(current) = current.as_object() {
             if current.is_empty() && self.preserve_empty_objects {
                 flattened.insert(parent_key, serde_json::json!({}));
+                // TODO: Make the feature optional
+            } else if current.iter().any(|(_, o)| !o.as_object().is_some()) {
+                flattened.insert(parent_key, serde_json::Value::Object(current.to_owned()));
             } else {
                 self.flatten_object(current, &parent_key, depth, flattened)?;
             }
